@@ -10,8 +10,7 @@ area = pi*(opening./2).^2;  % m^2
 flow_rate = speed*area;     % m^3/s
 
 time_open = mass_needed./(density*flow_rate); % s
-% plot(flow_rate)
-hold on
+
 plot(opening,time_open/60)
 title('Time per sample in relation to sample landing area')
 ylabel('Time open (min)')
