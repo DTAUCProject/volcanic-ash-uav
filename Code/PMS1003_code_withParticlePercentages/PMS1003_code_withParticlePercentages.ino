@@ -11,9 +11,10 @@
  // Green is TX on Arduino!!
  
 #include <Arduino.h>
-#define LENG 31                     //0x42 + 31 bytes equal to 32 bytes
+#define LENG 31                        // 0x42 + 31 bytes equal to 32 bytes
 #define DENSITY 3.67e-6  //0.000001    // Density of particulates in ug/um^3, PMS1003 assumes ~3.67 for PM readings
-#define MAX_PARTICLE_SIZE 20        // Max expected particle size in microns
+#define MAX_PARTICLE_SIZE 20           // Max expected particle size in microns
+#define DP 2                           // Decimal places for display of floats
 unsigned char buf[LENG];
  
 int PM01Value = 0;          //define PM1.0 value of the air detector module
@@ -97,43 +98,59 @@ void loop()
       Serial.println("  ug/m3");   
 
 //      Serial.print("My PM01 conc:      ");  
-//      Serial.print(myPM01conc, 2);
+//      Serial.print(myPM01conc, DP);
 //      Serial.println("  ug/m3");
 //
 //      Serial.print("My PM2.5 conc:     ");  
-//      Serial.print(myPM2_5conc, 2);
+//      Serial.print(myPM2_5conc, DP);
 //      Serial.println("  ug/m3");
 //
 //      Serial.print("My PM10 conc:      ");  
-//      Serial.print(myPM10conc, 2);
+//      Serial.print(myPM10conc, DP);
 //      Serial.println("  ug/m3");
 //      Serial.println();
 
       Serial.print("Total conc:        ");
-      Serial.print(totalConc);   // In ug/m3
+      Serial.print(totalConc, DP);   // In ug/m3
       Serial.println("  ug/m3"); 
-//      Serial.print(totalConc/1000);   // In mg/m3
+//      Serial.print(totalConc/1000, DP);   // In mg/m3
 //      Serial.println("  mg/m3");   
 
       Serial.print("PM0.05 conc:       ");  
-      Serial.print(PM005conc);
-      Serial.println("  ug/m3");  
+      Serial.print(PM005conc, DP);
+      Serial.print("  ug/m3,   ");
+      Serial.print((PM005conc/totalConc)*100, DP);
+      Serial.println("%");
 
       Serial.print("PM0.1 conc:        ");  
-      Serial.print(PM01conc);
-      Serial.println("  ug/m3");  
+      Serial.print(PM01conc, DP);
+      Serial.print("  ug/m3,   ");  
+      Serial.print((PM01conc/totalConc)*100, DP);
+      Serial.println("%");
 
       Serial.print("PM2.5 conc:        ");  
-      Serial.print(PM2_5conc);
-      Serial.println("  ug/m3");  
+      Serial.print(PM2_5conc, DP);
+      Serial.print("  ug/m3,   ");  
+      Serial.print((PM2_5conc/totalConc)*100, DP);
+      Serial.println("%");
 
       Serial.print("PM5 conc:          ");  
-      Serial.print(PM5conc);
-      Serial.println("  ug/m3");  
+      Serial.print(PM5conc, DP);
+      Serial.print("  ug/m3,   ");  
+      Serial.print((PM5conc/totalConc)*100, DP);
+      Serial.println("%");
 
       Serial.print("PM10 conc:         ");  
-      Serial.print(PM10conc);
-      Serial.println("  ug/m3");  
+      Serial.print(PM10conc, DP);
+      Serial.print("  ug/m3,   ");  
+      Serial.print((PM10conc/totalConc)*100, DP);
+      Serial.println("%");  
+
+      Serial.print("PM>10 conc:        ");  
+      Serial.print(PM_Over10conc, DP);
+      Serial.print("  ug/m3,   ");  
+      Serial.print((PM_Over10conc/totalConc)*100, DP);
+      Serial.println("%");  
 
       Serial.print("Over 10.0 in 0.1L: ");  
       Serial.print(numParticles_over_10);
