@@ -12,7 +12,7 @@
  
 #include <Arduino.h>
 #define LENG 31                     //0x42 + 31 bytes equal to 32 bytes
-#define DENSITY 3.67e-6  //0.000001    // Density of particulates in ug/um^3, PMS1003 assumes ~3.67 for PM readings
+#define DENSITY 1.31e-6  //0.000001    // Density of particulates in ug/um^3, PMS1003 assumes ~3.67 for PM readings
 #define MAX_PARTICLE_SIZE 20        // Max expected particle size in microns
 unsigned char buf[LENG];
  
