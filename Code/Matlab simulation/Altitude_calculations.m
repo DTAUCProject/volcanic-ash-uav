@@ -9,10 +9,6 @@ gradiant = 1/10;
 vertical_velocity = velocity*gradiant;
 time_s = 12000/vertical_velocity;
 
-
-
-
-
 for height = 1:12000/1000
     velocity(height) = (-100*sea_level_roh/height+120)/3.6;
     roh(height) = sea_level_roh/height;
