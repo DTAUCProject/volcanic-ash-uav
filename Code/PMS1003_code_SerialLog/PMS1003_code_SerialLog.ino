@@ -11,11 +11,11 @@
  // Green is TX on Arduino!!
  
 #include <Arduino.h>
-#define LENG 31                     //0x42 + 31 bytes equal to 32 bytes
+#define LENG 31                        //0x42 + 31 bytes equal to 32 bytes
 #define DENSITY 1.31e-6  //0.000001    // Density of particulates in ug/um^3, PMS1003 assumes ~3.67 for PM readings
-#define MAX_PARTICLE_SIZE 20        // Max expected particle size in microns
+#define MAX_PARTICLE_SIZE 20           // Max expected particle size in microns - ADJUST THS FOR TYPE OF PARTICLES PRESENT!!!!!
 unsigned char buf[LENG];
- 
+
 int PM01Value = 0;          //define PM1.0 value of the air detector module
 int PM2_5Value = 0;         //define PM2.5 value of the air detector module
 int PM10Value = 0;         //define PM10 value of the air detector module
@@ -45,7 +45,7 @@ void setup()
   Serial.setTimeout(1500);    //set the Timeout to 1500ms, longer than the data transmission periodic time of the sensor
 
   // Just for PLX-DAQ!!!
-//  Serial.println("LABEL,Time,Conc");
+  Serial.println("LABEL,Time of day,Time Since Start,Conc");
 }
  
 void loop()
@@ -88,17 +88,18 @@ void loop()
       OledTimer=millis(); 
 
       // GoBetwino Suff
-      Serial.print("#S|PMSLOG|[");
-      Serial.print(float(OledTimer)/1000);
-      Serial.print(",");
-      Serial.print(totalConc);
-      Serial.println("]#");
+//      Serial.print("#S|PMSLOG|[");
+//      Serial.print(float(OledTimer)/1000);
+//      Serial.print(",");
+//      Serial.print(totalConc);
+//      Serial.println("]#");
 
       // PLX-DAQ Stuff
 //      Serial.print("DATA,TIME,");
-////      Serial.print(float(OledTimer)/1000);
-////      Serial.print(", ");
-//      Serial.println(totalConc);
+      Serial.print("DATA,TIME,");
+      Serial.print(float(OledTimer)/1000);
+      Serial.print(", ");
+      Serial.println(totalConc);
 
     }
    
