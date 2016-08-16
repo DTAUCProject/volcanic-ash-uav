@@ -1,19 +1,20 @@
 //******************************
- //*Abstract: Read value of PM1,PM2.5 and PM10 of air quality
+ //*Abstract: Code used to log total particle concentration of matter with assumed DENSITY and MAX_PARTICLE_SIZE
+ //           using PLX-DAQ software for Excel. Also contains code for using GoBetwino software.
  //
- //*Version：V3.1
- //*Author：Zuyang @ HUST
- //*Modified by Cain for Arduino Hardware Serial port compatibility
- //*Date：March.25.2016
+ //*Author：Jamie Van de Laar
+ //*Modified from program originally written by Zuyang @ HUST
+ //*Date：August.16.2016
  //******************************
 
 
  // Green is TX on Arduino!!
  
 #include <Arduino.h>
-#define LENG 31                        //0x42 + 31 bytes equal to 32 bytes
-#define DENSITY 1.31e-6  //0.000001    // Density of particulates in ug/um^3, PMS1003 assumes ~3.67 for PM readings
-#define MAX_PARTICLE_SIZE 20           // Max expected particle size in microns - ADJUST THS FOR TYPE OF PARTICLES PRESENT!!!!!
+#define LENG 31               //0x42 + 31 bytes equal to 32 bytes
+#define DENSITY 1.31e-6       // Density of particulates in ug/um^3, PMS1003 assumes ~3.67 for PM readings
+#define MAX_PARTICLE_SIZE 40  // Max expected particle size in microns - USING 40 FOR AC FINE TEST DUST!!!!!
+#define DP 2                           // Decimal places for display of floats
 unsigned char buf[LENG];
 
 int PM01Value = 0;          //define PM1.0 value of the air detector module
@@ -37,6 +38,9 @@ float PM5conc = 0;        // Conc between 2.5 and 5.0
 float PM10conc = 0;       // Conc between 5.0 and 10.0
 float PM_Over10conc = 0;  // Conc between 10.0 and MAX_PARTICLE_SIZE
 float totalConc = 0;      // Total concentration in ug/m^3
+float totalConc_prev = 0;
+
+float sampleTime = 0;
 
  
 void setup()
@@ -44,12 +48,14 @@ void setup()
   Serial.begin(9600);   //use serial0
   Serial.setTimeout(1500);    //set the Timeout to 1500ms, longer than the data transmission periodic time of the sensor
 
-  // Just for PLX-DAQ!!!
+  // Create label - only for PLX-DAQ!!!
   Serial.println("LABEL,Time of day,Time Since Start,Conc");
 }
  
 void loop()
 {
+  // Sensor seems to get new data every 2.17 seconds... or 1.45 seconds...?
+  
   if(Serial.find(0x42)){    //start to read when detect 0x42
     Serial.readBytes(buf,LENG);
 //    Serial.println("buf");
@@ -77,29 +83,36 @@ void loop()
         PM10conc = return_ugConc(numParticles_over_5 - numParticles_over_10, (5 + 10)/2/2);
         PM_Over10conc = return_ugConc(numParticles_over_10, (10 + MAX_PARTICLE_SIZE)/2/2);
 
-        totalConc = PM005conc + PM01conc + PM2_5conc + PM5conc + PM10conc + PM_Over10conc;
+        // Sum to get total concentration in ug/m^3
+        totalConc = /*PM005conc + */PM01conc + PM2_5conc + PM5conc + PM10conc + PM_Over10conc;
       }
     } 
   }
  
   static unsigned long OledTimer=millis();  
-    if (millis() - OledTimer >=1000) 
+    if (millis() - OledTimer >= 2000) 
+//    if (totalConc != totalConc_prev)
     {
-      OledTimer=millis(); 
+//      sampleTime = float(millis() - OledTimer)/1000;
+      OledTimer = millis();
 
       // GoBetwino Suff
 //      Serial.print("#S|PMSLOG|[");
-//      Serial.print(float(OledTimer)/1000);
+//      Serial.print(float(OledTimer)/1000, DP);
 //      Serial.print(",");
-//      Serial.print(totalConc);
+//      Serial.print(totalConc, DP);
 //      Serial.println("]#");
 
       // PLX-DAQ Stuff
 //      Serial.print("DATA,TIME,");
       Serial.print("DATA,TIME,");
-      Serial.print(float(OledTimer)/1000);
-      Serial.print(", ");
-      Serial.println(totalConc);
+      Serial.print(float(OledTimer)/1000, DP);
+      Serial.print(",");
+//      Serial.print(sampleTime, DP);
+//      Serial.print(",");
+      Serial.println(totalConc, DP);
+
+//      totalConc_prev = totalConc;
 
     }
    
@@ -124,14 +137,6 @@ char checkValue(unsigned char *thebuf, char leng)
   return receiveflag;
 }
 
-//// OLD FUNCTION, NOW UNUSED!!
-//int transmitPM01(unsigned char *thebuf)
-//{
-//  int PM01Val;
-//  PM01Val=((thebuf[3]<<8) + thebuf[4]); //count PM1.0 value of the air detector module
-//  return PM01Val;
-//}
-
 unsigned long returnData(unsigned char *thebuf, int index1)
 {
   unsigned long particleVal;
@@ -143,7 +148,7 @@ unsigned long returnData(unsigned char *thebuf, int index1)
 float return_ugConc(unsigned long numParticles, float avgRadius)
 {
   float C;
-  C = DENSITY*10000*numParticles*(4/3)*M_PI*avgRadius*avgRadius*avgRadius;
+  C = DENSITY*10000*float(numParticles)*(4/3)*M_PI*avgRadius*avgRadius*avgRadius;
   return C;
 }
 
