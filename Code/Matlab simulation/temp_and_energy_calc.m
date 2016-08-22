@@ -41,7 +41,7 @@ Motor_I = 20; %????? A
 glide_distance = 30000; % m
 
 Ep = m * g * height;
-Vbatt = 12.8;
+Vbatt = 11.1;
 Echem = 3600 * Vbatt * 10;
 
 %from last years project
@@ -63,5 +63,51 @@ ylabel('airspeed (m/s)');
 
 % P = E * s^-1
 % Power consumed -> P = I*V
-consumed_power = OPC_power + Motor_I * 12.8 + RPi_I * 5 + PIXHAWK_I * 5
+consumed_power = OPC_power + Motor_I * Vbatt + RPi_I * 5 + PIXHAWK_I * 5
 consumed_energy = consumed_power * 3600
+%% Heat Calculations
+clc
+% Four walls to lose heat from
+
+v = 5; % m/s 
+wall_thickness = 0.01; % m
+body_length = 0.8; % m
+body_width = 0.13; % m
+A_plane = body_width * body_length; % m^2
+outside_temp = -20; %C
+inside_temp = 10; %C
+
+% Convection: Qcv = h * A * theta
+% eqn from http://www.engineeringtoolbox.com/convective-heat-transfer-d_430.html
+hc = 10.45 - v + 10 * v^(1/2); %W / (m^2)*K
+
+Qcv = hc * A_plane * (inside_temp - outside_temp)
+
+% Conduction: Qcn = K * A * (dT / s) where s = wall thickness
+% eqn from http://www.engineeringtoolbox.com/conductive-heat-transfer-d_428.html
+K = 0.033; %Thermal conductivity of polystyrene (W / m*K)
+dT = inside_temp - outside_temp;
+
+Qcn = K * A_plane * (dT / wall_thickness)
+
+% Radiation Qrn = e * sigma * A * (Tin^4 - Tout^4)
+e = 0.6;
+sigma = 5.6703e-8; 
+inside_temp_K = 273.15 + inside_temp;
+outside_temp_K = 273.15 + outside_temp;
+Qrn = e * sigma * A_plane * (inside_temp_K^4 - outside_temp_K^4)
+
+% Total heat loss = Qcn + Qcv + Qr
+Qtot = Qcn + Qcv + Qrn;
+% four sides of plane
+Qtot = Qtot * 4
+
+% Heat produced by the components
+
+
+
+
+
+
+
+
