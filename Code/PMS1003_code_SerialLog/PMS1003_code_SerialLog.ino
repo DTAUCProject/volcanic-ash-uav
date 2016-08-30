@@ -13,8 +13,8 @@
 #include <Arduino.h>
 #define LENG 31               //0x42 + 31 bytes equal to 32 bytes
 #define DENSITY 1.31e-6       // Density of particulates in ug/um^3, PMS1003 assumes ~3.67 for PM readings
-#define MAX_PARTICLE_SIZE 40  // Max expected particle size in microns - USING 40 FOR AC FINE TEST DUST!!!!!
-#define DP 2                           // Decimal places for display of floats
+#define MAX_PARTICLE_SIZE 40  // Max expected particle size in microns - USING 40 FOR AC FINE DUST AND ISO DUST!!
+#define DP 2                  // Decimal places for display of floats
 unsigned char buf[LENG];
 
 int PM01Value = 0;          //define PM1.0 value of the air detector module
@@ -84,7 +84,7 @@ void loop()
         PM_Over10conc = return_ugConc(numParticles_over_10, (10 + MAX_PARTICLE_SIZE)/2/2);
 
         // Sum to get total concentration in ug/m^3
-        totalConc = /*PM005conc + */PM01conc + PM2_5conc + PM5conc + PM10conc + PM_Over10conc;
+        totalConc = /*PM005conc +*/ PM01conc + PM2_5conc + PM5conc + PM10conc + PM_Over10conc;
       }
     } 
   }
