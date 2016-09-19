@@ -85,17 +85,17 @@ void loop()
     {
       OledTimer=millis(); 
        
-      Serial.print("PM1.0:             ");  
-      Serial.print(PM01Value);
-      Serial.println("  ug/m3");            
-     
-      Serial.print("PM2.5:             ");  
-      Serial.print(PM2_5Value);
-      Serial.println("  ug/m3");     
-       
-      Serial.print("PM10:              ");  
-      Serial.print(PM10Value);
-      Serial.println("  ug/m3");   
+//      Serial.print("PM1.0:             ");  
+//      Serial.print(PM01Value);
+//      Serial.println("  ug/m3");            
+//     
+//      Serial.print("PM2.5:             ");  
+//      Serial.print(PM2_5Value);
+//      Serial.println("  ug/m3");     
+//       
+//      Serial.print("PM10:              ");  
+//      Serial.print(PM10Value);
+//      Serial.println("  ug/m3");   
 
 //      Serial.print("My PM01 conc:      ");  
 //      Serial.print(myPM01conc, DP);
@@ -110,43 +110,43 @@ void loop()
 //      Serial.println("  ug/m3");
 //      Serial.println();
 
-      Serial.print("Total conc:        ");
+      Serial.print("Total conc:             ");
       Serial.print(totalConc, DP);   // In ug/m3
       Serial.println("  ug/m3"); 
 //      Serial.print(totalConc/1000, DP);   // In mg/m3
 //      Serial.println("  mg/m3");   
 
-      Serial.print("PM0.05 conc:       ");  
+      Serial.print("0.03 to 0.05 um conc:   ");  
       Serial.print(PM005conc, DP);
       Serial.print("  ug/m3,   ");
       Serial.print((PM005conc/totalConc)*100, DP);
       Serial.println("%");
 
-      Serial.print("PM0.1 conc:        ");  
+      Serial.print("0.05 to 0.1 um conc:    ");  
       Serial.print(PM01conc, DP);
       Serial.print("  ug/m3,   ");  
       Serial.print((PM01conc/totalConc)*100, DP);
       Serial.println("%");
 
-      Serial.print("PM2.5 conc:        ");  
+      Serial.print("0.1 to 2.5 um conc:     ");  
       Serial.print(PM2_5conc, DP);
       Serial.print("  ug/m3,   ");  
       Serial.print((PM2_5conc/totalConc)*100, DP);
       Serial.println("%");
 
-      Serial.print("PM5 conc:          ");  
+      Serial.print("2.5 to 5 um conc:       ");  
       Serial.print(PM5conc, DP);
       Serial.print("  ug/m3,   ");  
       Serial.print((PM5conc/totalConc)*100, DP);
       Serial.println("%");
 
-      Serial.print("PM10 conc:         ");  
+      Serial.print("5 to 10 um conc:        ");  
       Serial.print(PM10conc, DP);
       Serial.print("  ug/m3,   ");  
       Serial.print((PM10conc/totalConc)*100, DP);
       Serial.println("%");  
 
-      Serial.print("PM>10 conc:        ");  
+      Serial.print(">10 um conc:            ");  
       Serial.print(PM_Over10conc, DP);
       Serial.print("  ug/m3,   ");  
       Serial.print((PM_Over10conc/totalConc)*100, DP);
