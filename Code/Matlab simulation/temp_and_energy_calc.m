@@ -1,4 +1,4 @@
-% Heat calculations
+% Power calculations
 clear, clc
 
 rho_0 = 1.2250; % air density at sea level
@@ -20,22 +20,6 @@ rho = rho_0*exp(-g*M*h/R/T_0);
 m = 2; %kg
 height = 10000;
 
-battery = 2200; % mA hr
-
-OPC_I_testing = 175; %mA when testing
-OPC_I_idle = 95; %mA when idle
-OPC_weigt = 105; %grams
-OPC_voltage = 5; %V
-OPC_power = (175 * 5)/1000; %W
-
-PIXHAWK_I = 280/1000; % mA (Pixhawk running APM:Plane 3.3.0, 
-                    %GPS/Compass modules, safety switch, 
-                    %buzzer, 433 MHz telemetry radio)
-                    
-RPi_temp_requirement = 0; % some peripherals aren't guaranteed below zero.
-RPi_I = 750/1000; % mA
-
-Motor_I = 20; %????? A
 
 % Assume wind speed is at 20 kmph average
 glide_distance = 30000; % m
@@ -61,10 +45,42 @@ xlabel('altitude (m)');
 ylabel('airspeed (m/s)');
 %a = sqrt(2*m*g/rho/K) % airspeed
 
-% P = E * s^-1
+OPC_I_testing = 175; %mA when testing
+OPC_I_idle = 95; %mA when idle
+OPC_weigt = 105; %grams
+OPC_voltage = 5; %V
+OPC_power = (175 * 5)/1000; %W
+
+telem_I = 1;
+
+PIXHAWK_I = 280/1000; % mA (Pixhawk running APM:Plane 3.3.0, 
+                    %GPS/Compass modules, safety switch, 
+                    %buzzer, 433 MHz telemetry radio)
+                    
+RPi_temp_requirement = 0; % some peripherals aren't guaranteed below zero.
+RPi_I = 350/1000; % mA
+
+Motor_I = 20; %????? A
+
+% P = E / s
 % Power consumed -> P = I*V
-consumed_power = OPC_power + Motor_I * Vbatt + RPi_I * 5 + PIXHAWK_I * 5
-consumed_energy = consumed_power * 3600
+const_current_drawn = PIXHAWK_I + RPi_I + telem_I + OPC_I_testing/1000;
+consumed_power = OPC_power + Motor_I * Vbatt + RPi_I * 5 + PIXHAWK_I * 5;
+consumed_energy = consumed_power * 3600;
+
+% Distance travelled
+dist_out = 30000; %km
+glide_dist = 30000; %km
+rise_time = 30*60; % 30 minutes
+battery_size = 8; % Ah
+
+descent_time = dist_out / 10; % 10 m/s to travel 30km
+tot_time = rise_time + descent_time
+tot_const_current_drawn = const_current_drawn *(tot_time / 3600);
+
+Ah_left = battery_size - tot_const_current_drawn;
+powered_dist =  (Ah_left / 15) * 36000
+
 %% Heat Calculations
 clc
 % Four walls to lose heat from
