@@ -1,0 +1,10 @@
+import spidev
+import opc
+
+# Open a SPI connection on CE0
+spi = spidev.SpiDev()
+spi.open(0, 0)
+
+# Set the SPI mode and clock speed
+spi.mode = 1
+spi.max_speed_hz = 500000

@@ -1,0 +1,108 @@
+import spidev
+import opc
+import math
+import serial
+import time
+
+# Constants
+DENSITY = 1.31#e-6  # Particle bulk density in ug/um^3
+BIN_AVG_DIAM = [0.46, 0.66, 0.915, 1.195, 1.465, 1.83, 2.535, 3.5, 4.5, 5.75, 7.25, 9, 11, 13, 15, 16.75]
+SAMPLE_VOL_WEIGHTINGS = [4.5, 3, 2, 0.5, 0.3, 0.25, 0.25, 0.25, 0.35, 0.45, 0.5, 0.8, 1, 1, 1, 1]
+
+
+def initSPI():
+	
+	# Open a SPI connection on CE0 
+	spi = spidev.SpiDev()
+	spi.open(0, 0)
+
+	# Set the SPI mode and clock speed
+	spi.mode = 1
+	spi.max_speed_hz = 10000
+	
+	return spi
+	
+	
+def initOPC(spi):
+	
+	try:
+		OPC = opc.OPCN2(spi)
+	except Exception as e:
+		print ("Startup Error: {}".format(e))
+		return 0
+	
+	# Turn the opc ON
+	if (not OPC.on()):
+		print("OPCN2 won't turn on")
+		return 1
+		
+	time.sleep(2)
+	return OPC
+	
+
+def returnBinMass(histogram, binNum):
+	binName = "Bin 0"
+	binName = binName.replace("0", str(binNum))
+	
+	binMass = histogram[binName] * DENSITY * (4/3) * math.pi * \
+	pow((BIN_AVG_DIAM[binNum]/2),3) * SAMPLE_VOL_WEIGHTINGS[binNum]
+	
+	return binMass
+	
+	
+def returnTotalConc(histogram):
+	totalMass = 0
+	
+	for i in range(0, 15):   ############################## Check integration range!!
+		totalMass += returnBinMass(histogram, i)
+	
+	#~ totalConc = 1e6 * totalMass/(histogram["SFR"] * histogram["Sampling Period"])
+	
+	totalConc = totalMass/(histogram["SFR"] * histogram["Sampling Period"])
+	
+	return totalConc
+	
+	
+def main():
+	
+	totalConc = 0
+	count = 0
+	
+	spi = initSPI()
+	alpha = initOPC(spi)
+	
+	#~ port = serial.Serial("/dev/ttyAMA0", baudrate=115200, timeout=3.0)
+	#~ port.write("LABEL,Time,Conc\r\n")
+	
+	if (alpha == 0 or alpha == 1):
+		print("Start up error")
+		quit()
+		
+	start = time.time()
+	
+	try:
+		while (1):		
+			
+			hist = alpha.histogram()
+			totalConc = returnTotalConc(hist)
+			
+			currTime = time.time() - start
+			
+			# For Gobetwino:
+			print("#S|OPCLOGTEST|[{:03.1f},{:03.2f}]#".format(currTime, totalConc))
+			#~ port.write("#S|OPCLOGTEST|[,{0:.2f}]#\n".format(totalConc)) 
+			#~ port.flush()
+			
+			# For PLX-DAQ:
+			#~ port.write("DATA,TIME,")
+			#~ port.write("{0:.2f}\r\n".format(totalConc))
+			
+			
+			time.sleep(1)
+			count += 1
+			
+	except KeyboardInterrupt:
+		# Turn the OPC off
+		alpha.off()
+
+main()
