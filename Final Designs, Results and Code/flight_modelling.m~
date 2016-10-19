@@ -39,19 +39,21 @@ K = ClAl*cos(theta) + CdAd*sin(theta);
 for i = 1:length(rho)
    a(i) = sqrt(2*m*g/rho(i)/K) - 15;
 end
-b = cumtrapz(a);
+b = cumtrapz(a)
 vsp = a*sin(theta); % vertical air speed
 gsp = a*cos(theta); % Horizontal air speed
-t_h = 0;% time to descend to sea level
-d_h = 0; % Distance travelled horizontally
-for i = 1:length(vsp)
-    t_h = t_h + h_step / vsp(i);
-    d_h = d_h + (h_step / vsp(i)) * gsp(i);
+t_h
+for i = 1:length(h)
+    t_h = t
 end
-%t_h
-%d_h 
+t_h = sum(h_step/vsp) % time to descend to sea level
+d_h = t_h.*gsp% Distance travelled horizontally
 
-plot(h,a)
+plot(t_h, d_h)
+sum(d_h)
+
+sum(b)
+%plot(h,a)
 grid on
 xlabel('altitude (m)');
 ylabel('airspeed (m/s)');
